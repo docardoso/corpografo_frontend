@@ -1,0 +1,7 @@
+services:
+  nicegui:
+    image: zauberzeug/nicegui:latest
+    ports:
+      - 8080:8080
+    volumes:
+      - .:/app # mounting local app directory

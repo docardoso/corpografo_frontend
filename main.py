@@ -159,6 +159,7 @@ def login(client: Client) -> Optional[RedirectResponse]:
 
 ui.run(
     host='0.0.0.0',
+    port=80,
     storage_secret=NICEGUI_STORAGE_SECRET_KEY,
     title = 'Corpografo (dev)',
 )

@@ -1,18 +1,35 @@
 from typing import Optional
 from util import notify_error, input_required
-from api_requests import api_post
+from api_requests import api_request
 from fastapi.responses import RedirectResponse
 from nicegui import Client, app, ui
 import os
 import requests
+from starlette.middleware.base import BaseHTTPMiddleware
+from fastapi import Request
 
 HCAPTCHA_SITEKEY = os.getenv("HCAPTCHA_SITEKEY")
 HCAPTCHA_SECRETKEY = os.getenv("HCAPTCHA_SECRETKEY"),
 
+unrestricted_page_routes = {'/login'}
+
+class AuthMiddleware(BaseHTTPMiddleware):
+    async def dispatch(self, request: Request, call_next):
+        #print('-'*10)
+        #print(app.storage.user)
+        #print(request.url.path)
+        #print(Client.page_routes)
+        #print('-'*10)
+        if not app.storage.user.get('access_token', False):
+            if request.url.path not in unrestricted_page_routes and request.url.path in Client.page_routes.values():
+                app.storage.user['referrer_path'] = request.url.path  # remember where the user wanted to go
+                return RedirectResponse('/login')
+        return await call_next(request)
+
 
 async def try_login(email, password, client) -> None:
     if await check_captcha(client):
-        r = api_post('login', email=email.value, password=password.value)
+        r = api_request('post', 'login', email=email.value, password=password.value)
 
         if r.status_code == 200:
             app.storage.user.update({'email': email.value, **r.json()})
@@ -24,12 +41,12 @@ async def try_login(email, password, client) -> None:
 
 async def try_register(name, email, client: Client) -> None:
     if await check_captcha(client):
-        r = api_post('register', name=name.value, email=email.value, access_level=2)
+        r = api_request('post', 'register', name=name.value, email=email.value, access_level=2)
 
         if r.status_code == 201:
             ui.notify(f'User successfully registered', color='positive')
-            name.set_value(None)
-            email.set_value(None)
+            name.set_value("")
+            email.set_value("")
         else:
             notify_error(r)
     else:

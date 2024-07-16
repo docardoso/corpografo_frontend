@@ -1,15 +1,20 @@
-from functools import partial
-
 import os
 import secrets
 
+import urllib3
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+
 from nicegui import app, ui
 
-from api_requests import api_request
+from util import api_request
 
-import login, document, corpus
+from resources import *
 
 from util import make_header_and_menu
+
+from starlette.formparsers import MultiPartParser
+
+MultiPartParser.max_file_size = 1024 * 1024 * 10  # 10 MB
 
 app.add_middleware(login.AuthMiddleware)
 

@@ -1,0 +1,1 @@
+from resources import corpus, document, language, login, organization, author

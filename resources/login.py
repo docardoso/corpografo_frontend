@@ -1,6 +1,6 @@
 from typing import Optional
 from util import notify_error, input_required
-from api_requests import api_request
+from util import api_request
 from fastapi.responses import RedirectResponse
 from nicegui import Client, app, ui
 import os
@@ -28,7 +28,7 @@ class AuthMiddleware(BaseHTTPMiddleware):
 
 
 async def try_login(email, password, client) -> None:
-    if await check_captcha(client):
+    if True:  #await check_captcha(client):
         r = api_request('post', 'login', email=email.value, password=password.value)
 
         if r.status_code == 200:
@@ -40,7 +40,7 @@ async def try_login(email, password, client) -> None:
         ui.notify("Captcha not passed", color="negative")
 
 async def try_register(name, email, client: Client) -> None:
-    if await check_captcha(client):
+    if True:  #await check_captcha(client):
         r = api_request('post', 'register', name=name.value, email=email.value, access_level=2)
 
         if r.status_code == 201:
@@ -53,7 +53,7 @@ async def try_register(name, email, client: Client) -> None:
         ui.notify("Captcha not passed", color="negative")
 
 async def check_captcha(client: Client) -> bool:
-    h_captcha_response = await ui.run_javascript("get_hcaptcha_response();")
+    h_captcha_response = await ui.run_javascript("get_hcaptcha_response();", timeout=5.0)
     ip = client.environ['asgi.scope']['client'][0]
     payload = {
         "secret": HCAPTCHA_SECRETKEY,
@@ -109,6 +109,8 @@ def login(client: Client) -> Optional[RedirectResponse]:
             #        #password = ui.input('Password', password=True, password_toggle_button=True).classes('w-full')
             #        ui.button('Register', on_click=lambda: try_register(register_name, register_email, client))
 
-        ui.element("div").classes("h-captcha").props(f'data-sitekey="{HCAPTCHA_SITEKEY}" data-theme="light"')
+        #ui.element("div").classes("h-captcha").props(f'data-sitekey="{HCAPTCHA_SITEKEY}" data-theme="light"')
+        #print(ui.run_javascript("document.getElementsByClassName('h-captcha');", timeout=5.0))
+        #print(ui.run_javascript("hcaptcha.render('h-captcha', {'sitekey': '" + HCAPTCHA_SITEKEY + "'});", timeout=5.0))
 
     return None

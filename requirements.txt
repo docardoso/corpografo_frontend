@@ -1,4 +1,1 @@
 nicegui
-pypdf
-beautifulsoup4
-python-docx

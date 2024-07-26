@@ -292,7 +292,7 @@ async def link_entities(query_entity:str, endpoint_spec:str, reference_id:int, r
     with ui.dialog() as dialog, ui.card():
         #query_entity = 'corpus' if reference_entity == 'document' else 'document'
         user_entities = api_request('get', query_entity).json()
-        print(user_entities)
+        #print(user_entities)
         selected_id = ui.select({i['id']: i['name'] for i in user_entities}, label=f'Which {query_entity}?', with_input=True)
 
         with ui.row():
@@ -317,7 +317,7 @@ def unlink_entities(endpoint, refresh):
         notify_error(response)
 
 
-def make_generic_detail_entity_page(entity: str, fields: dict[str, dict[str, Any]]) -> Callable[[int], None]:
+def make_generic_detail_entity_page(entity: str, fields: dict[str, dict[str, Any]], make_ops_menu: Callable[[int], None]=None) -> Callable[[int], None]:
     def detail_entity(entity_id):
         @ui.refreshable
         def render_page():
@@ -325,9 +325,15 @@ def make_generic_detail_entity_page(entity: str, fields: dict[str, dict[str, Any
 
             with ui.card().classes('w-1/2 h-5/6 absolute-center no-shadow'):
                 with ui.scroll_area().classes('w-full h-full'):
-                    ui.label(f'{entity.capitalize()} detail').style('font-size: 150%')
+                    ui.label(f'{entity.capitalize()} detailing').style('font-size: 150%')
 
-                    ui.button('Save changes', on_click=partial(update_entity, entity, entity_id, fields))
+                    with ui.row():
+                        ui.button('Save changes', on_click=partial(update_entity, entity, entity_id, fields))
+
+                        if make_ops_menu is not None:
+                            with ui.button('Operations'):
+                                with ui.menu() as menu:
+                                    make_ops_menu(entity_id)
 
                     for i in fields:
                         if fields[i]['input_type'] == 'table':

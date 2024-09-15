@@ -236,7 +236,7 @@ def make_generic_list_entity_page(entity: str, table_title: str | None = None) -
         make_header_and_menu()
         entity_collection = api_request('get', entity).json()
 
-        with ui.card().classes('w-1/2 h-5/6 absolute-center items-center no-shadow'):
+        with ui.card().classes('w-2/3 h-5/6 absolute-center items-center no-shadow'):
             with ui.scroll_area().classes('w-full h-full'):
 
                 table = ui.table(
@@ -268,7 +268,7 @@ def create_entity(entity, fields):
 def make_generic_new_entity_page(entity: str, fields: dict[str, dict[str, Any]]) -> Callable[[], None]:
     def create_entity_page() -> None:
         util.make_header_and_menu()
-        with ui.card().classes('w-1/2 h-5/6 absolute-center items-center no-shadow'):
+        with ui.card().classes('w-2/3 h-5/6 absolute-center items-center no-shadow'):
             with ui.scroll_area().classes('w-full h-full'):
                 ui.label(f'New {entity}').style('font-size: 150%')
 
@@ -323,7 +323,7 @@ def make_generic_detail_entity_page(entity: str, fields: dict[str, dict[str, Any
         def render_page():
             entity_item = api_request('get', f'{entity}/{entity_id}').json()
 
-            with ui.card().classes('w-1/2 h-5/6 absolute-center no-shadow'):
+            with ui.card().classes('w-2/3 h-5/6 absolute-center no-shadow'):
                 with ui.scroll_area().classes('w-full h-full'):
                     ui.label(f'{entity.capitalize()} detailing').style('font-size: 150%')
 
